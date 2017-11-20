@@ -11,16 +11,6 @@ public class GameManager : SerializedMonoBehaviour {
 
     // State
     static bool isPaused = false;
-    public static bool[] collectibleTracker;
-
-    static bool isPlayerLowHealth = false;
-    public static bool IsPlayerLowHealth
-    {
-        get
-        {
-            return isPlayerLowHealth;
-        }
-    }
 
     // Player references
     static GameObject playerObject;
@@ -42,17 +32,17 @@ public class GameManager : SerializedMonoBehaviour {
     }
 
     #region lazyload references
-    static Transform _terrain;
-    static Transform terrain
+    static Transform _landscape;
+    public static Transform Landscape
     {
         get
         {
-            if (_terrain == null)
+            if (_landscape == null)
             {
-                _terrain = GameObject.Find("Terrain").transform;
+                _landscape = GameObject.Find("Landscape").transform;
             }
 
-            return _terrain;
+            return _landscape;
         }
     }
 
@@ -152,15 +142,6 @@ public class GameManager : SerializedMonoBehaviour {
 
     #endregion
 
-    #region gamestate data flags
-
-    public static void SetIsPlayerLowHealth(bool _isPlayerLowHealth)
-    {
-        isPlayerLowHealth = _isPlayerLowHealth;
-    }
-
-    #endregion
-
     #region en-masse entity manipulation
 
     public static void RegisterEmitter(EntityEmitter emitter)
@@ -225,9 +206,9 @@ public class GameManager : SerializedMonoBehaviour {
         float distanceFromObstacleToTarget = float.MaxValue;
         Transform nearestObstacle = agent;
 
-        for (int i = 0; i < terrain.childCount; i++)
+        for (int i = 0; i < Landscape.childCount; i++)
         {
-            Transform obstacle = terrain.GetChild(i);
+            Transform obstacle = Landscape.GetChild(i);
             float sqrDistanceToPosition = (obstacle.position - positionNearTarget).sqrMagnitude;
 
             if (sqrDistanceToPosition < distanceFromObstacleToTarget)
@@ -279,18 +260,6 @@ public class GameManager : SerializedMonoBehaviour {
             return mainCamera.ScreenToWorldPoint(Input.mousePosition);
         }
     }
-
-    #endregion
-
-    #region environment management 
-
-    [SerializeField]
-    float roomTransitionTime;
-    public static float RoomTransitionTime { get { return instance.roomTransitionTime; } }
-
-    [SerializeField]
-    AnimationCurve roomTransitionCurve;
-    public static AnimationCurve RoomTransitionCurve { get { return instance.roomTransitionCurve; } }
 
     #endregion
 }

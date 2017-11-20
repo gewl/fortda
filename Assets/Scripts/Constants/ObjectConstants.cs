@@ -1,20 +1,30 @@
-﻿public enum Colors
+﻿public class ObjectTraits
 {
-    Red,
-    Green,
-    Blue
-}
+    public enum Traits
+    {
+        Colors,
+        Sizes,
+        Shapes
+    }
 
-public enum Sizes
-{
-    Small,
-    Medium,
-    Large
-}
+    public enum Colors
+    {
+        Red,
+        Green,
+        Blue
+    }
 
-public enum Shape
-{
-    Cube,
-    Sphere,
-    Pyramid
+    public enum Sizes
+    {
+        Small,
+        Medium,
+        Large
+    }
+
+    public enum Shapes
+    {
+        Cube,
+        Sphere,
+        Cylinder
+    }
 }
