@@ -9,6 +9,9 @@ public class ObjectSpawner : MonoBehaviour {
     Material initialSkin;
     [SerializeField]
     float timeToEmerge;
+    [SerializeField]
+    float objectSpawnPeriodicity;
+    float objectSpawnTimer;
 
     Transform landscape;
     Transform objectsParent;
@@ -17,6 +20,8 @@ public class ObjectSpawner : MonoBehaviour {
     int numberOfShapes;
     int numberOfColors;
     int numberOfSizes;
+
+    const string EMISSION_COLOR = "_EmissionColor";
 
 	void Start () {
         landscape = GameManager.Landscape;
@@ -34,8 +39,20 @@ public class ObjectSpawner : MonoBehaviour {
         numberOfSizes = Enum.GetNames(typeof(ObjectTraits.Sizes)).Length;
 
         SpawnObjectRandomly();
+        objectSpawnTimer = 0f;
 	}
-	
+
+    private void Update()
+    {
+        objectSpawnTimer += Time.deltaTime;
+
+        if (objectSpawnTimer > objectSpawnPeriodicity)
+        {
+            SpawnObjectRandomly();
+            objectSpawnTimer = 0f;
+        }
+    }
+
     void SpawnObjectRandomly()
     {
         int randomShapeIndex = (int)Mathf.Round(UnityEngine.Random.Range(0, numberOfShapes));
@@ -46,8 +63,8 @@ public class ObjectSpawner : MonoBehaviour {
         Material color = TraitInformation.GetObjectColor((ObjectTraits.Colors)randomColorIndex);
         Vector3 size = TraitInformation.GetObjectSize((ObjectTraits.Sizes)randomSizeIndex);
 
-        float xLocation = UnityEngine.Random.Range(-landscapeBounds.extents.x + size.x, landscapeBounds.extents.x - size.x);
-        float zLocation = UnityEngine.Random.Range(-landscapeBounds.extents.z + size.z, landscapeBounds.extents.z - size.z);
+        float xLocation = UnityEngine.Random.Range(0f, landscapeBounds.size.x - size.x);
+        float zLocation = UnityEngine.Random.Range(0f, landscapeBounds.size.z - size.z);
 
         Vector3 spawnLocation = new Vector3(xLocation, landscape.position.y - (size.y / 2f), zLocation);
 
@@ -61,11 +78,13 @@ public class ObjectSpawner : MonoBehaviour {
     {
         MeshRenderer objectRenderer = newObject.GetComponent<MeshRenderer>();
         Collider objectCollider = newObject.GetComponent<Collider>();
+        Rigidbody objectRigidbody = newObject.GetComponent<Rigidbody>();
 
         objectCollider.enabled = false;
-        objectRenderer.material = initialSkin;
+        objectRenderer.material = color;
+        objectRenderer.material.SetColor(EMISSION_COLOR, Color.black);
         Vector3 originalPosition = newObject.transform.position;
-        Vector3 destination = new Vector3(originalPosition.x, originalPosition.y + newObject.transform.localScale.y + 10, originalPosition.z);
+        Vector3 destination = new Vector3(originalPosition.x, originalPosition.y + newObject.transform.lossyScale.y + 20f, originalPosition.z);
 
         float timeElapsed = 0.0f;
         while (timeElapsed < timeToEmerge)
@@ -73,11 +92,17 @@ public class ObjectSpawner : MonoBehaviour {
             float percentageComplete = timeElapsed / timeToEmerge;
 
             newObject.transform.position = Vector3.Lerp(originalPosition, destination, percentageComplete);
+            //initialSkin.Lerp(initialSkin, color, percentageComplete);
+            objectRenderer.material.SetColor(EMISSION_COLOR, Color.Lerp(initialSkin.GetColor(EMISSION_COLOR), color.GetColor(EMISSION_COLOR), percentageComplete));
 
             timeElapsed += Time.deltaTime;
             yield return null;
         }
 
+        objectRenderer.material = color;
+        objectRigidbody.velocity = Vector3.up * 20f;
+        objectRigidbody.AddTorque(Vector3.forward * 10f, ForceMode.Impulse);
+        yield return new WaitForFixedUpdate();
         objectCollider.enabled = true;
     }
 }
