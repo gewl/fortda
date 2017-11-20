@@ -10,7 +10,10 @@ public class ObjectSpawner : MonoBehaviour {
     [SerializeField]
     float timeToEmerge;
     [SerializeField]
-    float objectSpawnPeriodicity;
+    float objectMinimumSpawnTimer;
+    [SerializeField]
+    float objectMaximumSpawnTimer;
+    float timeToNextSpawn;
     float objectSpawnTimer;
 
     Transform landscape;
@@ -40,16 +43,18 @@ public class ObjectSpawner : MonoBehaviour {
 
         SpawnObjectRandomly();
         objectSpawnTimer = 0f;
+        timeToNextSpawn = UnityEngine.Random.Range(objectMinimumSpawnTimer, objectMaximumSpawnTimer);
 	}
 
     private void Update()
     {
         objectSpawnTimer += Time.deltaTime;
 
-        if (objectSpawnTimer > objectSpawnPeriodicity)
+        if (objectSpawnTimer > timeToNextSpawn)
         {
             SpawnObjectRandomly();
             objectSpawnTimer = 0f;
+            timeToNextSpawn = UnityEngine.Random.Range(objectMinimumSpawnTimer, objectMaximumSpawnTimer);
         }
     }
 
@@ -92,7 +97,6 @@ public class ObjectSpawner : MonoBehaviour {
             float percentageComplete = timeElapsed / timeToEmerge;
 
             newObject.transform.position = Vector3.Lerp(originalPosition, destination, percentageComplete);
-            //initialSkin.Lerp(initialSkin, color, percentageComplete);
             objectRenderer.material.SetColor(EMISSION_COLOR, Color.Lerp(initialSkin.GetColor(EMISSION_COLOR), color.GetColor(EMISSION_COLOR), percentageComplete));
 
             timeElapsed += Time.deltaTime;

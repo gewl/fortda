@@ -8,12 +8,12 @@ public class CameraController : MonoBehaviour {
  
     [SerializeField]
     PostProcessingProfile pauseProfile;
-    [SerializeField]
-    float yDistance = 21f;
-    [SerializeField]
-    float entityXOffset = 15f;
-    [SerializeField]
-    float entityZOffset = -15f;
+    //[SerializeField]
+    //float yDistance = 21f;
+    //[SerializeField]
+    //float entityXOffset = 15f;
+    //[SerializeField]
+    //float entityZOffset = -15f;
     [SerializeField]
     float smoothTime = 0.05f;
     [SerializeField]
@@ -23,6 +23,12 @@ public class CameraController : MonoBehaviour {
 
     Vector3 dampVelocity = Vector3.zero;
     Camera mainCamera;
+    Vector3 offset;
+
+    private void Awake()
+    {
+        offset = followEntity.transform.position - transform.position;
+    }
 
     void Start()
     {
@@ -37,14 +43,11 @@ public class CameraController : MonoBehaviour {
     void Update()
     {
         Vector3 entityPosition = followEntity.position;
-        entityPosition.x += entityXOffset;
-        entityPosition.z += entityZOffset;
-
         Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
         Vector3 nextCameraPosition = Vector3.Lerp(entityPosition, mousePosition, distanceToMouse);
 
-        nextCameraPosition.y = entityPosition.y + yDistance;
+        nextCameraPosition -= offset;
 
         transform.position = Vector3.SmoothDamp(transform.position, nextCameraPosition, ref dampVelocity, smoothTime);
     }

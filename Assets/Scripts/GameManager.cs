@@ -19,11 +19,18 @@ public class GameManager : SerializedMonoBehaviour {
 
     [SerializeField]
     float entityFallSpeed = 30f;
+    [SerializeField]
+    float timeToBirthPlayer;
     static public float GetEntityFallSpeed { get { return instance.entityFallSpeed; } }
 
     void Awake()
     {
         instance = this;
+    }
+
+    void Start()
+    {
+        StartCoroutine(BirthPlayer());
     }
 
     void Update()
@@ -222,7 +229,34 @@ public class GameManager : SerializedMonoBehaviour {
     }
     #endregion
 
-    #region input data retrieval
+    IEnumerator BirthPlayer()
+    {
+        MeshRenderer objectRenderer = player.GetComponent<MeshRenderer>();
+        Collider objectCollider = player.GetComponent<Collider>();
+        Rigidbody objectRigidbody = player.GetComponent<Rigidbody>();
+
+        objectCollider.enabled = false;
+        Vector3 originalPosition = player.transform.position;
+        Vector3 destination = new Vector3(originalPosition.x, originalPosition.y + player.transform.lossyScale.y + 20f, originalPosition.z);
+
+        float timeElapsed = 0.0f;
+        while (timeElapsed < timeToBirthPlayer)
+        {
+            float percentageComplete = timeElapsed / timeToBirthPlayer;
+
+            player.transform.position = Vector3.Lerp(originalPosition, destination, percentageComplete);
+
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        objectRigidbody.velocity = Vector3.up * 20f;
+        yield return new WaitForFixedUpdate();
+        objectCollider.enabled = true;
+        player.GetComponent<EntityEmitter>().isMuted = false;
+    }
+
+   #region input data retrieval
 
     public static Vector3 GetMousePositionOnPlayerPlane()
     {

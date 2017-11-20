@@ -37,15 +37,16 @@ public class RotateWithVelocity : EntityComponent {
 
     void OnFixedUpdate()
     {
-        if (entityRigidbody.velocity.sqrMagnitude >= 0.1f)
+        Vector3 effectiveVelocity = new Vector3(entityRigidbody.velocity.x, 0f, entityRigidbody.velocity.z);
+        if (effectiveVelocity.sqrMagnitude >= 0.1f)
         {
             if (isSmoothing)
             {
-                transform.rotation = Quaternion.LookRotation(smoothVelocity(entityRigidbody.velocity));
+                transform.rotation = Quaternion.LookRotation(smoothVelocity(effectiveVelocity));
             }
             else
             {
-                Quaternion nextRotation = Quaternion.LookRotation(entityRigidbody.velocity);
+                Quaternion nextRotation = Quaternion.LookRotation(effectiveVelocity);
                 transform.rotation = nextRotation;
             }
         }

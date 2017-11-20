@@ -27,6 +27,8 @@ public class AutonomousMovementComponent : EntityComponent {
         Cohesion
     }
 
+    Vector3 currentVelocity;
+
     [Title("Behaviors dictating entity movement", "Sorted in decreasing order of priority")]
     [SerializeField]
     private List<MovementBehaviorTypes> movementBehaviors;
@@ -113,10 +115,13 @@ public class AutonomousMovementComponent : EntityComponent {
 
     bool isOnARamp;
     int groundedCount = 0;
+    int terrainLayer;
 
     protected override void Awake()
     {
         base.Awake();
+        currentVelocity = Vector3.zero;
+        terrainLayer = LayerMask.NameToLayer("Terrain");
         entityRigidbody = GetComponent<Rigidbody>();
 
         activeMovementBehaviors = new List<AutonomousMovementBehavior>();
@@ -149,7 +154,9 @@ public class AutonomousMovementComponent : EntityComponent {
     {
         if (!isOnARamp && groundedCount == 0)
         {
-            entityRigidbody.velocity = -Vector3.up * GameManager.GetEntityFallSpeed;
+            //entityRigidbody.velocity = -Vector3.up * GameManager.GetEntityFallSpeed;
+            Vector3 newPosition = new Vector3(transform.position.x, transform.position.y - GameManager.GetEntityFallSpeed * Time.deltaTime, transform.position.z);
+            transform.position = newPosition;
             return;
         }
         if (ArriveTarget != null)
@@ -200,13 +207,19 @@ public class AutonomousMovementComponent : EntityComponent {
 
         accumulatedForce.y = 0f;
 
-        entityRigidbody.AddForce(accumulatedForce, ForceMode.VelocityChange);
-        entityRigidbody.velocity = Vector3.ClampMagnitude(entityRigidbody.velocity, maxSpeed);
+        Vector3 acceleration = accumulatedForce / entityRigidbody.mass;
+        currentVelocity += acceleration * Time.deltaTime;
+        Debug.Log(currentVelocity);
+        Vector3.ClampMagnitude(currentVelocity, maxSpeed);
+
+        transform.position += currentVelocity * Time.deltaTime;
+        //entityRigidbody.AddForce(accumulatedForce, ForceMode.VelocityChange);
+        //entityRigidbody.velocity = Vector3.ClampMagnitude(entityRigidbody.velocity, maxSpeed);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        if (collision.gameObject.layer == terrainLayer)
         {
             groundedCount++;
         }
@@ -218,7 +231,7 @@ public class AutonomousMovementComponent : EntityComponent {
 
     void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        if (collision.gameObject.layer == terrainLayer)
         {
             groundedCount--;
         }
