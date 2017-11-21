@@ -18,6 +18,15 @@ public class GameManager : SerializedMonoBehaviour {
     Plane playerPlane;
 
     [SerializeField]
+    Terrain activeTerrain;
+    public static Terrain ActiveTerrain
+    {
+        get
+        {
+            return instance.activeTerrain;
+        }
+    }
+    [SerializeField]
     float entityFallSpeed = 30f;
     [SerializeField]
     float timeToBirthPlayer;
@@ -233,11 +242,12 @@ public class GameManager : SerializedMonoBehaviour {
     {
         MeshRenderer objectRenderer = player.GetComponent<MeshRenderer>();
         Collider objectCollider = player.GetComponent<Collider>();
+        MouseNavMeshMovement playerMovement = player.GetComponent<MouseNavMeshMovement>();
         Rigidbody objectRigidbody = player.GetComponent<Rigidbody>();
 
         objectCollider.enabled = false;
         Vector3 originalPosition = player.transform.position;
-        Vector3 destination = new Vector3(originalPosition.x, originalPosition.y + player.transform.lossyScale.y + 20f, originalPosition.z);
+        Vector3 destination = new Vector3(originalPosition.x, originalPosition.y + (2f * player.transform.lossyScale.y), originalPosition.z);
 
         float timeElapsed = 0.0f;
         while (timeElapsed < timeToBirthPlayer)
@@ -250,9 +260,9 @@ public class GameManager : SerializedMonoBehaviour {
             yield return null;
         }
 
-        objectRigidbody.velocity = Vector3.up * 20f;
         yield return new WaitForFixedUpdate();
         objectCollider.enabled = true;
+        //playerMovement.enabled = true;
         player.GetComponent<EntityEmitter>().isMuted = false;
     }
 

@@ -28,6 +28,7 @@ public class AutonomousMovementComponent : EntityComponent {
     }
 
     Vector3 currentVelocity;
+    public Vector3 CurrentVelocity { get { return currentVelocity; } }
 
     [Title("Behaviors dictating entity movement", "Sorted in decreasing order of priority")]
     [SerializeField]
@@ -111,17 +112,19 @@ public class AutonomousMovementComponent : EntityComponent {
 
     Rigidbody entityRigidbody;
     public Rigidbody EntityRigidbody { get { return entityRigidbody; } }
-    public Vector3 CurrentVelocity { get { return entityRigidbody.velocity; } }
 
     bool isOnARamp;
     int groundedCount = 0;
     int terrainLayer;
+    int terrainLayerMask;
+    bool onceGrounded = false;
 
     protected override void Awake()
     {
         base.Awake();
         currentVelocity = Vector3.zero;
         terrainLayer = LayerMask.NameToLayer("Terrain");
+        terrainLayerMask = (1 << terrainLayer);
         entityRigidbody = GetComponent<Rigidbody>();
 
         activeMovementBehaviors = new List<AutonomousMovementBehavior>();
@@ -152,13 +155,14 @@ public class AutonomousMovementComponent : EntityComponent {
 
     void OnFixedUpdate()
     {
-        if (!isOnARamp && groundedCount == 0)
-        {
-            //entityRigidbody.velocity = -Vector3.up * GameManager.GetEntityFallSpeed;
-            Vector3 newPosition = new Vector3(transform.position.x, transform.position.y - GameManager.GetEntityFallSpeed * Time.deltaTime, transform.position.z);
-            transform.position = newPosition;
-            return;
-        }
+        //if (!isOnARamp && groundedCount == 0)
+        //{
+        //    Vector3 newPosition = new Vector3(transform.position.x, transform.position.y - GameManager.GetEntityFallSpeed * Time.deltaTime, transform.position.z);
+        //    transform.position = newPosition;
+
+        //    currentVelocity = Vector3.zero;
+        //    return;
+        //}
         if (ArriveTarget != null)
         {
             Vector3 toTarget = ArriveTarget.position - transform.position;
@@ -209,12 +213,19 @@ public class AutonomousMovementComponent : EntityComponent {
 
         Vector3 acceleration = accumulatedForce / entityRigidbody.mass;
         currentVelocity += acceleration * Time.deltaTime;
-        Debug.Log(currentVelocity);
-        Vector3.ClampMagnitude(currentVelocity, maxSpeed);
+        currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
 
-        transform.position += currentVelocity * Time.deltaTime;
-        //entityRigidbody.AddForce(accumulatedForce, ForceMode.VelocityChange);
-        //entityRigidbody.velocity = Vector3.ClampMagnitude(entityRigidbody.velocity, maxSpeed);
+        Vector3 projectedPosition = transform.position + (currentVelocity * Time.deltaTime);
+        projectedPosition.y = 20f;
+
+        RaycastHit hit;
+        if (Physics.Raycast(projectedPosition, Vector3.down, out hit, float.MaxValue, terrainLayerMask))
+        {
+            projectedPosition.y = hit.point.y + (transform.lossyScale.y);
+            Vector3 toPosition = projectedPosition - transform.position;
+            toPosition = Vector3.ClampMagnitude(toPosition, maxSpeed);
+            transform.position += toPosition;
+        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -223,10 +234,6 @@ public class AutonomousMovementComponent : EntityComponent {
         {
             groundedCount++;
         }
-        else if (collision.gameObject.CompareTag("Ramp"))
-        {
-            isOnARamp = true;
-        }
     }
 
     void OnCollisionExit(Collision collision)
@@ -234,10 +241,6 @@ public class AutonomousMovementComponent : EntityComponent {
         if (collision.gameObject.layer == terrainLayer)
         {
             groundedCount--;
-        }
-        else if (collision.gameObject.CompareTag("Ramp"))
-        {
-            isOnARamp = false;
         }
     }
 }
