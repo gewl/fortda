@@ -10,6 +10,8 @@ public class ObjectSpawner : MonoBehaviour {
     [SerializeField]
     float timeToEmerge;
     [SerializeField]
+    int maximumNumberOfObjects;
+    [SerializeField]
     float objectMinimumSpawnTimer;
     [SerializeField]
     float objectMaximumSpawnTimer;
@@ -18,6 +20,7 @@ public class ObjectSpawner : MonoBehaviour {
 
     Transform landscape;
     Transform objectsParent;
+    List<GameObject> spawnedObjects;
     Bounds landscapeBounds;
 
     int numberOfShapes;
@@ -26,7 +29,12 @@ public class ObjectSpawner : MonoBehaviour {
 
     const string EMISSION_COLOR = "_EmissionColor";
 
-	void Start () {
+    private void Awake()
+    {
+        spawnedObjects = new List<GameObject>();
+    }
+
+    void Start () {
         landscape = GameManager.Landscape;
         objectsParent = GameObject.Find("Objects").transform;
         TerrainCollider[] terrainColliders = landscape.GetComponentsInChildren<TerrainCollider>();
@@ -50,7 +58,7 @@ public class ObjectSpawner : MonoBehaviour {
     {
         objectSpawnTimer += Time.deltaTime;
 
-        if (objectSpawnTimer > timeToNextSpawn)
+        if (spawnedObjects.Count < maximumNumberOfObjects && objectSpawnTimer > timeToNextSpawn)
         {
             SpawnObjectRandomly();
             objectSpawnTimer = 0f;
@@ -74,6 +82,7 @@ public class ObjectSpawner : MonoBehaviour {
         Vector3 spawnLocation = new Vector3(xLocation, landscape.position.y - (size.y / 2f), zLocation);
 
         GameObject newObject = Instantiate(shape, spawnLocation, Quaternion.identity, objectsParent);
+        spawnedObjects.Add(newObject);
         newObject.transform.localScale = size;
 
         StartCoroutine(BirthTheThing(newObject, color));
