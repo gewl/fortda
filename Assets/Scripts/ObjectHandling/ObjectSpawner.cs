@@ -49,6 +49,7 @@ public class ObjectSpawner : MonoBehaviour {
         numberOfColors = Enum.GetNames(typeof(ObjectTraits.Colors)).Length;
         numberOfSizes = Enum.GetNames(typeof(ObjectTraits.Sizes)).Length;
 
+        SpawnTestObject();
         SpawnObjectRandomly();
         objectSpawnTimer = 0f;
         timeToNextSpawn = UnityEngine.Random.Range(objectMinimumSpawnTimer, objectMaximumSpawnTimer);
@@ -64,6 +65,34 @@ public class ObjectSpawner : MonoBehaviour {
             objectSpawnTimer = 0f;
             timeToNextSpawn = UnityEngine.Random.Range(objectMinimumSpawnTimer, objectMaximumSpawnTimer);
         }
+    }
+
+    void SpawnTestObject()
+    {
+        int randomShapeIndex = (int)Mathf.Round(UnityEngine.Random.Range(0, numberOfShapes));
+        int randomColorIndex = (int)Mathf.Round(UnityEngine.Random.Range(0, numberOfColors));
+        int randomSizeIndex = (int)Mathf.Round(UnityEngine.Random.Range(0, numberOfSizes));
+
+        GameObject shape = TraitInformation.GetObjectShape((ObjectTraits.Shapes)randomShapeIndex);
+        Material color = TraitInformation.GetObjectColor((ObjectTraits.Colors)randomColorIndex);
+        Vector3 size = TraitInformation.GetObjectSize((ObjectTraits.Sizes)randomSizeIndex);
+
+        float xLocation = 251f;
+        float zLocation = 251f;
+
+        Vector3 spawnLocation = new Vector3(xLocation, landscape.position.y - (size.y / 2f), zLocation);
+
+        GameObject newObject = Instantiate(shape, spawnLocation, Quaternion.identity, objectsParent);
+        spawnedObjects.Add(newObject);
+        newObject.transform.localScale = size;
+
+        ObjectBehavior objectBehavior = newObject.GetComponent<ObjectBehavior>();
+        objectBehavior.Color = color;
+        objectBehavior.Size = size;
+        objectBehavior.Shape = shape;
+
+        StartCoroutine(BirthTheThing(newObject, color));
+
     }
 
     void SpawnObjectRandomly()
@@ -84,6 +113,11 @@ public class ObjectSpawner : MonoBehaviour {
         GameObject newObject = Instantiate(shape, spawnLocation, Quaternion.identity, objectsParent);
         spawnedObjects.Add(newObject);
         newObject.transform.localScale = size;
+
+        ObjectBehavior objectBehavior = newObject.GetComponent<ObjectBehavior>();
+        objectBehavior.Color = color;
+        objectBehavior.Size = size;
+        objectBehavior.Shape = shape;
 
         StartCoroutine(BirthTheThing(newObject, color));
     }
@@ -113,9 +147,11 @@ public class ObjectSpawner : MonoBehaviour {
         }
 
         objectRenderer.material = color;
-        objectRigidbody.velocity = Vector3.up * 20f;
+        //objectRigidbody.velocity = Vector3.up * 20f;
         objectRigidbody.AddTorque(Vector3.forward * 10f, ForceMode.Impulse);
+
         yield return new WaitForFixedUpdate();
+
         objectCollider.enabled = true;
     }
 }

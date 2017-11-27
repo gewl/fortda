@@ -20,8 +20,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4204338867551370}
   - component: {fileID: 135732988643510926}
+  - component: {fileID: 114052580302448002}
   - component: {fileID: 82766763512214426}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ImpactSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,6 +122,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &114052580302448002
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1278076519902608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ff0f250c62cb0147a61091b2fb5b70d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!135 &135732988643510926
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -131,5 +143,5 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 60
+  m_Radius: 80
   m_Center: {x: 0, y: 0, z: 0}

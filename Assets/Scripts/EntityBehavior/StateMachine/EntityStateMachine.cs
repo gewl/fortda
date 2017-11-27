@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class EntityStateMachine : MonoBehaviour
 {
-    private GameObject player;
-    public GameObject Player { get { return player; } }
+    private Thinker playerThinker;
+    public Thinker PlayerThinker { get { return playerThinker; } }
+    
+    private AutonomousMovementComponent movementComponent;
+    public AutonomousMovementComponent MovementComponent { get { return movementComponent; } }
 
     private EntityState previousState;
     public EntityState PreviousState { get { return previousState; } }
@@ -15,11 +19,27 @@ public class EntityStateMachine : MonoBehaviour
     private EntityState nextState;
     public EntityState NextState { get { return nextState; } }
 
+    public EntityState queuedNextState;
+
     private bool forced = false;
+    public bool StateLocked = false;
+
+    public void Hesitate()
+    {
+        queuedNextState = new InvestigatingSoundState(this);
+        nextState = new PonderingState(this);
+    }
+
+    public void StartChildCoroutine(IEnumerator coroutineMethod)
+    {
+        StartCoroutine(coroutineMethod);
+    }
 
     public void OnEnable()
     {
         nextState = new PonderingState(this);
+        playerThinker = GetComponent<Thinker>();
+        movementComponent = GetComponent<AutonomousMovementComponent>();
     }
 
     public void Start() { }
@@ -47,7 +67,7 @@ public class EntityStateMachine : MonoBehaviour
 
     public void SwitchState(EntityState nextState)
     {
-        if (forced)
+        if (forced || StateLocked)
         {
             return;
         }
@@ -67,6 +87,7 @@ public class EntityStateMachine : MonoBehaviour
             return;
         }
 
+        queuedNextState = null;
         this.nextState = nextState;
         forced = true;
     }

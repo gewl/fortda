@@ -117,7 +117,6 @@ public class AutonomousMovementComponent : EntityComponent {
     int groundedCount = 0;
     int terrainLayer;
     int terrainLayerMask;
-    bool onceGrounded = false;
 
     protected override void Awake()
     {
@@ -128,6 +127,11 @@ public class AutonomousMovementComponent : EntityComponent {
         entityRigidbody = GetComponent<Rigidbody>();
 
         GenerateActiveMovementBehaviorsFromEnums(initialMovementBehaviors);
+    }
+
+    public void ClearMovementBehaviors()
+    {
+        activeMovementBehaviors.Clear();
     }
 
     public void GenerateActiveMovementBehaviorsFromEnums(List<MovementBehaviorTypes> newBehaviors)
@@ -192,6 +196,11 @@ public class AutonomousMovementComponent : EntityComponent {
 
     void AccumulateForce()
     {
+        if (activeMovementBehaviors.Count == 0)
+        {
+            currentVelocity = Vector3.zero;
+            return;
+        }
         Vector3 accumulatedForce = Vector3.zero;
         for (int i = 0; i < activeMovementBehaviors.Count; i++)
         {

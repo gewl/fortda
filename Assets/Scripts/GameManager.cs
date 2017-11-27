@@ -240,10 +240,7 @@ public class GameManager : SerializedMonoBehaviour {
 
     IEnumerator BirthPlayer()
     {
-        MeshRenderer objectRenderer = player.GetComponent<MeshRenderer>();
         Collider objectCollider = player.GetComponent<Collider>();
-        MouseNavMeshMovement playerMovement = player.GetComponent<MouseNavMeshMovement>();
-        Rigidbody objectRigidbody = player.GetComponent<Rigidbody>();
 
         objectCollider.enabled = false;
         Vector3 originalPosition = player.transform.position;

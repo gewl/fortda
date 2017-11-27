@@ -34,7 +34,7 @@ public class SpeechBubbleManager : MonoBehaviour {
         bubbleTimer = bubbleDuration;
         mainCamera = Camera.main;
         activeSpeechBubbles = new Queue<GameObject>();
-        speechBubbleHeight = speechBubblePrefab.GetComponent<RectTransform>().lossyScale.y;
+        speechBubbleHeight = speechBubblePrefab.GetComponent<RectTransform>().rect.height;
     }
 
     private void Update()
@@ -100,6 +100,9 @@ public class SpeechBubbleManager : MonoBehaviour {
                 colorRenderers.Add(currentRenderer);
             }
         }
+        Image speechBubbleImage = speechBubble.GetComponent<Image>();
+        speechBubbleImage.CrossFadeAlpha(initialFadeValue, 0.0f, true);
+        speechBubbleImage.CrossFadeAlpha(targetFadeValue, bubbleFadeTime, true);
         float timeElapsed = 0.0f;
 
         while (timeElapsed < bubbleFadeTime)
@@ -123,4 +126,4 @@ public class SpeechBubbleManager : MonoBehaviour {
             Destroy(speechBubble);
         }
     }
-}
+} 

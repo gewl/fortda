@@ -8,20 +8,27 @@ public class PonderingState : EntityState {
         : base (machine) { }
 
     float timer;
-    Thinker thinker;
 
     public override void Enter()
     {
         timer = 2f;
-        thinker = machine.transform.GetComponent<Thinker>();
-        thinker.Think();
+        machine.PlayerThinker.Mull();
     }
 
     public override void Update()
     {
         if (timer <= 0)
         {
-            machine.SwitchState(new HaplessState(machine));
+            if (machine.queuedNextState != null)
+            {
+                EntityState nextState = machine.queuedNextState;
+                machine.queuedNextState = null;
+                machine.SwitchState(nextState);
+            }
+            else
+            {
+                machine.SwitchState(new HaplessState(machine));
+            }
         }
 
         timer -= Time.deltaTime;
@@ -29,6 +36,6 @@ public class PonderingState : EntityState {
 
     public override void Exit()
     {
-        Debug.Log("exiting pondering");
+
     }
 }
