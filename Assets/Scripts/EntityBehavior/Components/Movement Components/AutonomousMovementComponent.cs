@@ -32,7 +32,7 @@ public class AutonomousMovementComponent : EntityComponent {
 
     [Title("Behaviors dictating entity movement", "Sorted in decreasing order of priority")]
     [SerializeField]
-    private List<MovementBehaviorTypes> movementBehaviors;
+    private List<MovementBehaviorTypes> initialMovementBehaviors;
     private List<AutonomousMovementBehavior> activeMovementBehaviors;
 
     [SerializeField]
@@ -127,11 +127,16 @@ public class AutonomousMovementComponent : EntityComponent {
         terrainLayerMask = (1 << terrainLayer);
         entityRigidbody = GetComponent<Rigidbody>();
 
+        GenerateActiveMovementBehaviorsFromEnums(initialMovementBehaviors);
+    }
+
+    public void GenerateActiveMovementBehaviorsFromEnums(List<MovementBehaviorTypes> newBehaviors)
+    {
         activeMovementBehaviors = new List<AutonomousMovementBehavior>();
 
-        for (int i = 0; i < movementBehaviors.Count; i++)
+        for (int i = 0; i < newBehaviors.Count; i++)
         {
-            AutonomousMovementBehavior behaviorToAdd = GetMovementBehaviorClass(movementBehaviors[i]);
+            AutonomousMovementBehavior behaviorToAdd = GetMovementBehaviorClass(newBehaviors[i]);
 
             activeMovementBehaviors.Add(behaviorToAdd);
         }

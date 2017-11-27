@@ -12,10 +12,12 @@ public class RotateWithVelocity : EntityComponent {
 
     int nextUpdateSlot;
     Vector3[] cachedVelocities;
+    AutonomousMovementComponent movementComponent;
 
     protected override void Awake()
     {
         base.Awake();
+        movementComponent = GetComponent<AutonomousMovementComponent>();
         entityRigidbody = GetComponent<Rigidbody>();
         cachedVelocities = new Vector3[valuesToSmooth];
 
@@ -37,7 +39,7 @@ public class RotateWithVelocity : EntityComponent {
 
     void OnFixedUpdate()
     {
-        Vector3 effectiveVelocity = new Vector3(entityRigidbody.velocity.x, 0f, entityRigidbody.velocity.z);
+        Vector3 effectiveVelocity = new Vector3(movementComponent.CurrentVelocity.x, 0f, movementComponent.CurrentVelocity.z);
         if (effectiveVelocity.sqrMagnitude >= 0.1f)
         {
             if (isSmoothing)

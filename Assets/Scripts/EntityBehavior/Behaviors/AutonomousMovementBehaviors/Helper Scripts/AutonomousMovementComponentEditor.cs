@@ -22,6 +22,10 @@ public class AutonomousMovementComponentEditor : OdinEditor {
     {
         base.OnInspectorGUI();
 
+        if (movementBehaviors == null)
+        {
+            return;
+        }
         behaviorsListSize = movementBehaviors.arraySize;
 
         for (int i = 0; i < behaviorsListSize; i++)

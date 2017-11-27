@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Thinker : MonoBehaviour {
+public class PlayerInvestigatingState : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {

@@ -262,8 +262,8 @@ public class GameManager : SerializedMonoBehaviour {
 
         yield return new WaitForFixedUpdate();
         objectCollider.enabled = true;
-        //playerMovement.enabled = true;
         player.GetComponent<EntityEmitter>().isMuted = false;
+        player.GetComponent<EntityStateMachine>().enabled = true;
     }
 
    #region input data retrieval
