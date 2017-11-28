@@ -20,6 +20,20 @@ public class ObjectSpawner : MonoBehaviour {
 
     Transform landscape;
     Transform objectsParent;
+    Transform hud;
+    public Transform HUD
+    {
+        get
+        {
+            if (hud == null)
+            {
+                hud = GameObject.Find("HUD").transform;
+            }
+
+            return hud;
+        }
+    }
+
     List<GameObject> spawnedObjects;
     Bounds landscapeBounds;
 
@@ -67,6 +81,36 @@ public class ObjectSpawner : MonoBehaviour {
         }
     }
 
+    public GameObject CreateAndReturnThoughtObject(GameObject shape, Material color, Vector3 size)
+    {
+        GameObject newObject = Instantiate(shape, Vector3.zero, Quaternion.identity, HUD);
+        spawnedObjects.Add(newObject);
+        newObject.transform.localScale = size * 25f;
+        newObject.GetComponent<Rigidbody>().useGravity = false;
+        newObject.GetComponent<Renderer>().material = color;
+
+        ObjectBehavior objectBehavior = newObject.GetComponent<ObjectBehavior>();
+        objectBehavior.Color = color;
+        objectBehavior.Size = size;
+        objectBehavior.Shape = shape;
+
+        return newObject;
+    }
+
+    GameObject CreateAndReturnWorldObject(GameObject shape, Material color, Vector3 size)
+    {
+        GameObject newObject = Instantiate(shape, Vector3.zero, Quaternion.identity, objectsParent);
+        spawnedObjects.Add(newObject);
+        newObject.transform.localScale = size;
+
+        ObjectBehavior objectBehavior = newObject.GetComponent<ObjectBehavior>();
+        objectBehavior.Color = color;
+        objectBehavior.Size = size;
+        objectBehavior.Shape = shape;
+
+        return newObject;
+    }
+
     void SpawnTestObject()
     {
         int randomShapeIndex = (int)Mathf.Round(UnityEngine.Random.Range(0, numberOfShapes));
@@ -82,14 +126,8 @@ public class ObjectSpawner : MonoBehaviour {
 
         Vector3 spawnLocation = new Vector3(xLocation, landscape.position.y - (size.y / 2f), zLocation);
 
-        GameObject newObject = Instantiate(shape, spawnLocation, Quaternion.identity, objectsParent);
-        spawnedObjects.Add(newObject);
-        newObject.transform.localScale = size;
-
-        ObjectBehavior objectBehavior = newObject.GetComponent<ObjectBehavior>();
-        objectBehavior.Color = color;
-        objectBehavior.Size = size;
-        objectBehavior.Shape = shape;
+        GameObject newObject = CreateAndReturnWorldObject(shape, color, size);
+        newObject.transform.position = spawnLocation;
 
         StartCoroutine(BirthTheThing(newObject, color));
 

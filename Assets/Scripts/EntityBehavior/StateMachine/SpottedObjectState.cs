@@ -90,9 +90,7 @@ public class SpottedObjectState : EntityState {
             yield return null;
         }
 
-        ObjectBehavior objectBehavior = spottedObject.GetComponent<ObjectBehavior>();
-        GameObject shape = objectBehavior.Shape;
-        Material color = objectBehavior.Color;
-        Vector3 size = objectBehavior.Size;
+        machine.PlayerThinker.PerceiveObject(spottedObject.gameObject);
+
     }
 }

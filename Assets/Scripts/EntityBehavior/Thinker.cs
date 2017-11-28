@@ -69,9 +69,11 @@ public class Thinker : MonoBehaviour {
             perceivedSizesSet.Add(size);
         }
 
-        if (!hasSeenShape || !hasSeenColor || !hasSeenSize)
+        if (!hasSeenShape && !hasSeenColor && !hasSeenSize)
         {
             //visual representation of new object discovered
+            Debug.Log("Totally new object");
+            bubbleManager.CreateNewDiscoveryBubble(shape, color, size);
         }
     }
     #endregion  

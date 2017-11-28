@@ -37,7 +37,7 @@ Transform:
   m_GameObject: {fileID: 1965210377023286}
   m_LocalRotation: {x: -0.09211982, y: -0.7980532, z: 0.12632778, w: 0.5819505}
   m_LocalPosition: {x: 84.00003, y: 66, z: -0.000013947486}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 2, y: 2, z: 1.2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -53,7 +53,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 105aefe1c5baea541a6b2e6cf3926dc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceFadeTime: 1
 --- !u!198 &198259870219386286
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -61,7 +60,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1965210377023286}
   serializedVersion: 5
-  lengthInSec: 1
+  lengthInSec: 0.3
   simulationSpeed: 1
   stopAction: 0
   looping: 0
@@ -121,7 +120,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 4
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -266,7 +265,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 15
       minScalar: 1
       maxCurve:
         serializedVersion: 2

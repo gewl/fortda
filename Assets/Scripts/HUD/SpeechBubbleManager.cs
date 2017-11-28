@@ -8,7 +8,12 @@ public class SpeechBubbleManager : MonoBehaviour {
     [SerializeField]
     GameObject speechBubblePrefab;
     [SerializeField]
+    GameObject darkSurfacePrefab;
+    [SerializeField]
     Transform player;
+
+    [SerializeField]
+    ObjectSpawner objectSpawner;
 
     [SerializeField]
     float bubbleContentsXPos = 84f;
@@ -60,6 +65,24 @@ public class SpeechBubbleManager : MonoBehaviour {
         GameObject newBubble = Instantiate(speechBubblePrefab, player.transform.position, transform.rotation, transform);
         GameObject contents = Instantiate(bubbleContents, newBubble.transform);
         contents.transform.localPosition = contentsPosition;
+
+        StartCoroutine(FadeBubble(newBubble));
+        activeSpeechBubbles.Enqueue(newBubble);
+    }
+
+    public void CreateNewDiscoveryBubble(GameObject shape, Material color, Vector3 size)
+    {
+        GameObject newBubble = Instantiate(speechBubblePrefab, player.transform.position, transform.rotation, transform);
+
+        GameObject contents = objectSpawner.CreateAndReturnThoughtObject(shape, color, size);
+        contents.transform.parent = newBubble.transform;
+
+        Vector3 discoveryObjectPosition = new Vector3(contentsPosition.x, contentsPosition.y, -1f);
+        contents.transform.localPosition = discoveryObjectPosition;
+
+        Vector3 darkSurfacePosition = new Vector3(contentsPosition.x, contentsPosition.y, -3f);
+        GameObject darkSurface = Instantiate(darkSurfacePrefab, newBubble.transform);
+        darkSurface.transform.localPosition = darkSurfacePosition;
 
         StartCoroutine(FadeBubble(newBubble));
         activeSpeechBubbles.Enqueue(newBubble);
